@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 사전</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <div id="app">
+      <form id="ask-form">
+        <textarea
+          id="input"
+          rows="2"
+          placeholder="단어·표현·질문 입력 후 Enter (Shift+Enter 줄바꿈)"
+          autofocus
+        ></textarea>
+        <div class="row">
+          <span id="meta" class="meta"></span>
+          <button type="submit" id="ask-btn">물어보기</button>
+        </div>
+      </form>
+      <div id="notice" class="notice" hidden></div>
+      <div id="answer" class="answer"></div>
+      <div class="footer">
+        <button type="button" id="copy-btn" class="link" hidden>📋 복사</button>
+        <button type="button" id="options-btn" class="link">⚙ 설정</button>
+      </div>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

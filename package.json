@@ -1,0 +1,18 @@
+{
+  "name": "ai-dictionary",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "궁금한 영어 표현을 빠르게 묻는 AI 사전 Chrome 확장 (단축키 팝업 + BYOK Gemini/Mindlogic)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.32",
+    "@types/chrome": "^0.0.287",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
