@@ -89,9 +89,6 @@ body {
   overflow-y: auto;
   line-height: 1.5;
 }
-.answer:empty {
-  margin-top: 0;
-}
 .answer.loading {
   color: var(--muted);
 }
@@ -154,12 +151,14 @@ body {
   margin: 10px 0;
 }
 
-.footer {
+/* 자주 쓰는 버튼 — 입력창 아래·답변 위에 고정. 답변은 자체 스크롤이라 길어져도 버튼이 안 밀린다. */
+.toolbar {
   display: flex;
+  align-items: center;
   gap: 14px;
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
+  margin-top: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
 }
 .link {
   padding: 0;
