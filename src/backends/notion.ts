@@ -268,8 +268,16 @@ export async function testNotion(token: string, dbId: string): Promise<void> {
   await getDbTitleProp(token, dbId);
 }
 
-// 답변을 Notion DB에 새 페이지로 저장. 반환: 생성된 페이지 URL.
-export async function saveToNotion(word: string, markdown: string): Promise<string> {
+// 답변 최상단의 영어 예문(인라인 코드)을 페이지 제목으로 뽑는다. 복습 DB 특성상 단어보다 예문이 제목으로 유용.
+// 첫 인라인 코드 한 줄을 쓰고, 없으면(자유질문 등 예문 부재) fallback(=입력 단어)으로 되돌린다.
+export function extractExampleTitle(markdown: string, fallback: string): string {
+  const m = markdown.match(/`([^`\n]+)`/); // 첫 번째 인라인 코드. 코드펜스(```)는 [^`]에 막혀 걸리지 않음.
+  const example = m?.[1].trim();
+  return example || fallback;
+}
+
+// 답변을 Notion DB에 새 페이지로 저장. 반환: 생성된 페이지 URL과 실제 사용된 제목.
+export async function saveToNotion(word: string, markdown: string): Promise<{ url: string; title: string }> {
   const token = await getNotionToken();
   const { notionDbId } = await loadSettings();
   if (!token || !notionDbId) {
@@ -285,10 +293,11 @@ export async function saveToNotion(word: string, markdown: string): Promise<stri
     truncated = true;
   }
 
+  const title = extractExampleTitle(markdown, word || '(제목 없음)').slice(0, MAX_TEXT_LEN);
   const body = {
     parent: { database_id: dbId },
     properties: {
-      [titleProp]: { title: [{ text: { content: (word || '(제목 없음)').slice(0, MAX_TEXT_LEN) } }] },
+      [titleProp]: { title: [{ text: { content: title } }] },
     },
     children,
   };
@@ -301,5 +310,5 @@ export async function saveToNotion(word: string, markdown: string): Promise<stri
   if (!res.ok) throw httpError(res.status, await res.text().catch(() => ''));
   const data = (await res.json()) as { url?: string };
   if (truncated) console.warn(TAG, `블록 ${MAX_CHILDREN}개 초과분은 잘림`);
-  return data.url ?? '';
+  return { url: data.url ?? '', title };
 }

@@ -121,7 +121,7 @@ copyBtn.addEventListener('click', () => {
   });
 });
 
-// 💾 Notion 저장 — 활성 탭의 질문을 제목, 답변 markdown을 본문 블록으로 새 페이지 생성.
+// 💾 Notion 저장 — 답변 속 예문(없으면 질문)을 제목, 답변 markdown을 본문 블록으로 새 페이지 생성.
 notionBtn.addEventListener('click', () => void saveToNotionFlow());
 
 async function saveToNotionFlow(): Promise<void> {
@@ -132,10 +132,10 @@ async function saveToNotionFlow(): Promise<void> {
   notionBtn.textContent = '저장 중…';
   hideNotice();
   try {
-    const url = await saveToNotion(word, domToMarkdown(answerEl));
+    const { url, title } = await saveToNotion(word, domToMarkdown(answerEl));
     notionBtn.textContent = '✓ 저장됨';
-    if (url) showNoticeLink('Notion에 저장됨 — ', url, '페이지 열기 ↗');
-    else showNotice('Notion에 저장됨', false);
+    if (url) showNoticeLink(`Notion에 저장됨: 「${title}」 — `, url, '페이지 열기 ↗');
+    else showNotice(`Notion에 저장됨: 「${title}」`, false);
     setTimeout(() => {
       notionBtn.textContent = '💾 Notion 저장';
       notionBtn.disabled = false;
