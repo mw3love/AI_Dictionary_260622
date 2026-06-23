@@ -10,8 +10,6 @@ export interface Settings {
   geminiModel: string;
   mindlogicModel: string;
   dictPrompt: string;
-  // 팝업이 열릴 때 클립보드를 입력창에 자동으로 채울지 (PasteFlow 등 외부 OCR → 클립보드 흐름).
-  autoPasteClipboard: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -19,7 +17,6 @@ export const DEFAULT_SETTINGS: Settings = {
   geminiModel: 'gemini-3.5-flash',
   mindlogicModel: 'claude-sonnet-4-6',
   dictPrompt: DEFAULT_DICT_PROMPT,
-  autoPasteClipboard: true,
 };
 
 export async function loadSettings(): Promise<Settings> {

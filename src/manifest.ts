@@ -12,7 +12,7 @@ export default defineManifest({
   },
   options_page: 'src/options/index.html',
   // 팝업/옵션은 확장 origin 페이지라 host_permissions가 있으면 직접 fetch 가능 → 별도 SW 불필요(v1).
-  permissions: ['storage', 'clipboardRead'],
+  permissions: ['storage'],
   host_permissions: [
     // Gemini (BYOK) — 사용자가 옵션에서 본인 키 입력 시에만 호출.
     'https://generativelanguage.googleapis.com/*',

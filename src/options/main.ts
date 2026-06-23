@@ -30,7 +30,6 @@ const geminiKey = $<HTMLInputElement>('gemini-key');
 const geminiModel = $<HTMLSelectElement>('gemini-model');
 const mindlogicKey = $<HTMLInputElement>('mindlogic-key');
 const mindlogicModel = $<HTMLSelectElement>('mindlogic-model');
-const autoPaste = $<HTMLInputElement>('auto-paste');
 const promptEl = $<HTMLTextAreaElement>('prompt');
 
 void init();
@@ -40,7 +39,6 @@ async function init(): Promise<void> {
   backendSel.value = s.backend;
   await populateModels('gemini', s.geminiModel);
   await populateModels('mindlogic', s.mindlogicModel);
-  autoPaste.checked = s.autoPasteClipboard;
   promptEl.value = s.dictPrompt;
   geminiKey.value = (await getGeminiApiKey()) ?? '';
   mindlogicKey.value = (await getMindlogicApiKey()) ?? '';
@@ -56,9 +54,6 @@ backendSel.addEventListener('change', () => {
 geminiModel.addEventListener('change', () => void saveSettings({ geminiModel: geminiModel.value }));
 mindlogicModel.addEventListener('change', () =>
   void saveSettings({ mindlogicModel: mindlogicModel.value }),
-);
-autoPaste.addEventListener('change', () =>
-  void saveSettings({ autoPasteClipboard: autoPaste.checked }),
 );
 promptEl.addEventListener('input', debounce(() => void saveSettings({ dictPrompt: promptEl.value }), 250));
 

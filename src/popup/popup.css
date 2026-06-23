@@ -55,6 +55,27 @@ body {
   font-size: 12px;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 🔄 새로고침 — 자주 쓰므로 물어보기 옆 보조 버튼으로 시인성 확보(주 버튼과 색 구분). */
+.btn-secondary {
+  padding: 6px 12px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--accent);
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  background: #e0e7ff;
+}
+
 #ask-btn {
   padding: 6px 14px;
   font: inherit;
@@ -151,7 +172,7 @@ body {
   margin: 10px 0;
 }
 
-/* 자주 쓰는 버튼 — 입력창 아래·답변 위에 고정. 답변은 자체 스크롤이라 길어져도 버튼이 안 밀린다. */
+/* 📋 복사 — 답변이 있을 때만(toolbar[hidden] 토글) 답변 위에 표시. 답변은 자체 스크롤이라 안 밀린다. */
 .toolbar {
   display: flex;
   align-items: center;
