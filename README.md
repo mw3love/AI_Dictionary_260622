@@ -45,6 +45,3 @@
 - `src/shared/` — settings·secrets·markdown 렌더러·프롬프트·모델 목록
 
 핵심 모듈(secrets·백엔드 호출·markdown 렌더러·사전 프롬프트)은 youtube_dual_subtitle 프로젝트의 해설 기능에서 이식.
-
-## v2 후보
-멀티턴 후속 질문, content-script 오버레이(풀스크린 영상 위), 확장 내장 OCR. (Notion API 직접 저장은 구현됨 → "설정 > Notion 저장".)
