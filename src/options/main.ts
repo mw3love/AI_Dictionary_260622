@@ -10,11 +10,14 @@ import {
   setGeminiApiKey,
   getMindlogicApiKey,
   setMindlogicApiKey,
+  getNotionToken,
+  setNotionToken,
 } from '../shared/secrets';
 import { GEMINI_MODELS, MINDLOGIC_MODELS } from '../shared/models';
 import type { ModelChoice } from '../shared/models';
 import { DEFAULT_DICT_PROMPT } from '../shared/prompts';
 import { testGemini, testMindlogic } from '../backends/ask';
+import { testNotion } from '../backends/notion';
 import {
   listGeminiModels,
   listMindlogicModels,
@@ -30,6 +33,8 @@ const geminiKey = $<HTMLInputElement>('gemini-key');
 const geminiModel = $<HTMLSelectElement>('gemini-model');
 const mindlogicKey = $<HTMLInputElement>('mindlogic-key');
 const mindlogicModel = $<HTMLSelectElement>('mindlogic-model');
+const notionToken = $<HTMLInputElement>('notion-token');
+const notionDb = $<HTMLInputElement>('notion-db');
 const promptEl = $<HTMLTextAreaElement>('prompt');
 
 void init();
@@ -40,8 +45,10 @@ async function init(): Promise<void> {
   await populateModels('gemini', s.geminiModel);
   await populateModels('mindlogic', s.mindlogicModel);
   promptEl.value = s.dictPrompt;
+  notionDb.value = s.notionDbId;
   geminiKey.value = (await getGeminiApiKey()) ?? '';
   mindlogicKey.value = (await getMindlogicApiKey()) ?? '';
+  notionToken.value = (await getNotionToken()) ?? '';
   reflectBackend(s.backend);
 }
 
@@ -71,6 +78,14 @@ mindlogicKey.addEventListener(
   'input',
   debounce(() => void setMindlogicApiKey(mindlogicKey.value.trim() || null), 250),
 );
+notionToken.addEventListener(
+  'input',
+  debounce(() => void setNotionToken(notionToken.value.trim() || null), 250),
+);
+notionDb.addEventListener(
+  'input',
+  debounce(() => void saveSettings({ notionDbId: notionDb.value.trim() }), 250),
+);
 
 // 테스트 버튼 — 보류 저장 flush 후 explicit 키로 검증.
 $<HTMLButtonElement>('gemini-test').addEventListener('click', async () => {
@@ -94,6 +109,23 @@ $<HTMLButtonElement>('mindlogic-test').addEventListener('click', async () => {
   setResult(out, '확인 중…', true);
   try {
     await testMindlogic(key, mindlogicModel.value);
+    setResult(out, '✓ 연결 성공', true);
+  } catch (e) {
+    setResult(out, '✗ ' + msg(e), false);
+  }
+});
+
+// Notion 연결 테스트 — 보류 저장 flush 후 토큰+DB ID로 스키마 조회 통과 여부 확인.
+$<HTMLButtonElement>('notion-test').addEventListener('click', async () => {
+  const out = $<HTMLSpanElement>('notion-test-result');
+  const token = notionToken.value.trim();
+  const dbId = notionDb.value.trim();
+  if (!token || !dbId) return setResult(out, '토큰과 DB ID를 입력하세요', false);
+  await setNotionToken(token);
+  await saveSettings({ notionDbId: dbId });
+  setResult(out, '확인 중…', true);
+  try {
+    await testNotion(token, dbId);
     setResult(out, '✓ 연결 성공', true);
   } catch (e) {
     setResult(out, '✗ ' + msg(e), false);

@@ -3,6 +3,7 @@
 // 🔄 새로고침으로 입력·답변을 비우고 빈 입력창에서 새로 시작(클립보드는 사용자가 직접 Ctrl+V).
 
 import { ask } from '../backends/ask';
+import { saveToNotion } from '../backends/notion';
 import { renderMarkdown } from '../shared/markdown';
 import { loadSettings } from '../shared/settings';
 import type { Settings } from '../shared/settings';
@@ -16,6 +17,7 @@ const noticeEl = document.getElementById('notice') as HTMLDivElement;
 const metaEl = document.getElementById('meta') as HTMLSpanElement;
 const toolbar = document.getElementById('toolbar') as HTMLDivElement;
 const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement;
+const notionBtn = document.getElementById('notion-btn') as HTMLButtonElement;
 const resetBtn = document.getElementById('reset-btn') as HTMLButtonElement;
 
 const SESSION_KEY = 'popupState';
@@ -89,6 +91,29 @@ copyBtn.addEventListener('click', () => {
     setTimeout(() => (copyBtn.textContent = '📋 복사'), 1500);
   });
 });
+
+// 💾 Notion 저장 — 현재 입력(단어)을 제목, 답변 markdown을 본문 블록으로 새 페이지 생성.
+notionBtn.addEventListener('click', () => void saveToNotionFlow());
+
+async function saveToNotionFlow(): Promise<void> {
+  if (!lastMarkdown || notionBtn.disabled) return;
+  const word = input.value.trim() || '(제목 없음)';
+  notionBtn.disabled = true;
+  notionBtn.textContent = '저장 중…';
+  hideNotice();
+  try {
+    await saveToNotion(word, lastMarkdown);
+    notionBtn.textContent = '✓ 저장됨';
+    setTimeout(() => {
+      notionBtn.textContent = '💾 Notion 저장';
+      notionBtn.disabled = false;
+    }, 1500);
+  } catch (err) {
+    notionBtn.textContent = '💾 Notion 저장';
+    notionBtn.disabled = false;
+    showNotice(err instanceof Error ? err.message : String(err), true);
+  }
+}
 
 resetBtn.addEventListener('click', () => void reset());
 

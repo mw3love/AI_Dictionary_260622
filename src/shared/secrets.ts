@@ -5,6 +5,7 @@
 
 const KEY_GEMINI_API = 'geminiApiKey';
 const KEY_MINDLOGIC_API = 'mindlogicApiKey';
+const KEY_NOTION_TOKEN = 'notionToken';
 
 export async function getGeminiApiKey(): Promise<string | null> {
   const r = await chrome.storage.local.get(KEY_GEMINI_API);
@@ -32,4 +33,19 @@ export async function setMindlogicApiKey(key: string | null): Promise<void> {
     return;
   }
   await chrome.storage.local.set({ [KEY_MINDLOGIC_API]: key });
+}
+
+// Notion internal integration 토큰 (BYOK). 답변을 Notion DB에 저장할 때 사용.
+export async function getNotionToken(): Promise<string | null> {
+  const r = await chrome.storage.local.get(KEY_NOTION_TOKEN);
+  const v = r[KEY_NOTION_TOKEN];
+  return typeof v === 'string' && v.trim() ? v.trim() : null;
+}
+
+export async function setNotionToken(token: string | null): Promise<void> {
+  if (!token) {
+    await chrome.storage.local.remove(KEY_NOTION_TOKEN);
+    return;
+  }
+  await chrome.storage.local.set({ [KEY_NOTION_TOKEN]: token });
 }

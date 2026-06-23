@@ -18,6 +18,8 @@ export default defineManifest({
     'https://generativelanguage.googleapis.com/*',
     // Mindlogic API Gateway (BYOK) — 학교/조직 계정 키로 OpenAI/Anthropic/Gemini 등 통과.
     'https://factchat-cloud.mindlogic.ai/*',
+    // Notion API (BYOK) — 답변을 사용자의 Notion DB에 저장. host_permission이 있어야 확장에서 직접 fetch(CORS 면제).
+    'https://api.notion.com/*',
   ],
   commands: {
     // 전역 단축키로 팝업을 연다. 사용자는 chrome://extensions/shortcuts 에서 재지정 가능.

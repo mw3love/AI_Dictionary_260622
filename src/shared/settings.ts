@@ -10,6 +10,8 @@ export interface Settings {
   geminiModel: string;
   mindlogicModel: string;
   dictPrompt: string;
+  // Notion 저장 대상 데이터베이스 ID(비밀 아님 → sync). 토큰은 secrets.ts(local)에 분리.
+  notionDbId: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -17,6 +19,7 @@ export const DEFAULT_SETTINGS: Settings = {
   geminiModel: 'gemini-3.5-flash',
   mindlogicModel: 'claude-sonnet-4-6',
   dictPrompt: DEFAULT_DICT_PROMPT,
+  notionDbId: '',
 };
 
 export async function loadSettings(): Promise<Settings> {
