@@ -24,7 +24,9 @@ export default defineManifest({
   commands: {
     // 전역 단축키로 팝업을 연다. 사용자는 chrome://extensions/shortcuts 에서 재지정 가능.
     _execute_action: {
-      suggested_key: { default: 'Ctrl+Shift+Y', mac: 'Command+Shift+Y' },
+      // 왼손 전용(오른손은 마우스). 기존 install은 이 기본값이 자동 반영 안 될 수 있어
+      // chrome://extensions/shortcuts 에서 직접 확인/지정 필요.
+      suggested_key: { default: 'Alt+Q', mac: 'Alt+Q' },
       description: 'AI 사전 열기',
     },
   },

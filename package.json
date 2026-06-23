@@ -1,7 +1,7 @@
 {
   "name": "ai-dictionary",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "type": "module",
   "description": "궁금한 영어 표현을 빠르게 묻는 AI 사전 Chrome 확장 (단축키 팝업 + BYOK Gemini/Mindlogic)",
   "scripts": {

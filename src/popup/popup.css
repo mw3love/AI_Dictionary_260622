@@ -20,7 +20,12 @@ body {
   background: #fff;
 }
 
+/* 세로 flex 기둥 — 입력·툴바는 고정, 답변(.answer)만 늘어나며 스크롤.
+   max-height로 팝업 전체 높이를 Chrome 한도(~600px) 안에 묶어 바깥 스크롤이 안 생기게(단일 스크롤바). */
 #app {
+  display: flex;
+  flex-direction: column;
+  max-height: 588px;
   padding: 12px;
 }
 
@@ -103,12 +108,114 @@ body {
   background: #fde8e8;
   color: #9b1c1c;
 }
+.notice.success {
+  background: #e7f6ec;
+  color: #1b6e3b;
+}
+.notice a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+}
 
 .answer {
   margin-top: 10px;
-  max-height: 460px;
+  flex: 1 1 auto;
+  min-height: 0; /* flex 자식이 넘칠 때 줄어들어 자체 스크롤이 생기게 */
   overflow-y: auto;
   line-height: 1.5;
+}
+/* 형광펜 모드 ON — 텍스트 선택 커서 + 미세한 배경으로 활성 신호 */
+.answer.mark-mode {
+  cursor: text;
+}
+
+/* 탭 스트립 — 답변이 2개 이상일 때 표시(바로 묻기로 쌓인 답들). 가로 스크롤. */
+.tabbar {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.tabbar[hidden] {
+  display: none;
+}
+/* 탭 스트립이 보이면 답변은 그 바로 아래에 붙는다(이중 여백 방지). */
+.tabbar:not([hidden]) + .answer {
+  margin-top: 0;
+}
+.tab {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  max-width: 160px;
+  border: 1px solid var(--border);
+  border-radius: 7px 7px 0 0;
+  background: #f6f7f9;
+}
+.tab.active {
+  background: #fff;
+  border-color: var(--accent);
+}
+.tab-label {
+  font: inherit;
+  font-size: 12px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 5px 4px 5px 9px;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tab.active .tab-label {
+  color: var(--fg);
+  font-weight: 600;
+}
+.tab-close {
+  font: inherit;
+  font-size: 11px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 0 7px 0 2px;
+  cursor: pointer;
+}
+.tab-close:hover {
+  color: #e2552e;
+}
+
+/* 재질문 미니메뉴 — 답변에서 텍스트 선택 시 뜨는 두 버튼(바로 묻기 / 입력창에) */
+#sel-menu {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: #1f2937;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+}
+#sel-menu[hidden] {
+  display: none;
+}
+#sel-menu button {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: transparent;
+  border: none;
+  padding: 5px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#sel-menu button:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 .answer.loading {
   color: var(--muted);
@@ -132,12 +239,13 @@ body {
 .answer li {
   margin: 2px 0;
 }
+/* 백틱 = 강조(노션 인라인코드 룩). 모델이 쓴 코드와 사용자가 🖍로 친 형광펜이 같은 빨강으로 통일. */
 .answer code {
   padding: 1px 5px;
   font-family: 'SFMono-Regular', Consolas, monospace;
   font-size: 0.92em;
-  background: var(--code-bg);
-  color: var(--code-fg);
+  background: rgba(226, 85, 46, 0.1);
+  color: #e2552e;
   border-radius: 4px;
 }
 .answer pre {
@@ -192,4 +300,21 @@ body {
 }
 .link:hover {
   color: var(--accent);
+}
+/* 🖍 형광펜 ON — 빨강 강조색으로 활성 표시 */
+.link.active {
+  color: #e2552e;
+  font-weight: 600;
+}
+/* 💾 Notion 저장 — 사용빈도 높아 채운 알약 버튼으로 시인성↑ (다른 텍스트 버튼과 구분) */
+#notion-btn {
+  padding: 4px 10px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 6px;
+}
+#notion-btn:hover {
+  color: #fff;
+  background: #1d4ed8;
 }

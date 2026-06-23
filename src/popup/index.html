@@ -25,9 +25,12 @@
       </form>
       <div id="notice" class="notice" hidden></div>
       <div id="toolbar" class="toolbar" hidden>
+        <button type="button" id="mark-btn" class="link" title="백틱 형광펜 — 켠 뒤 중요한 부분을 드래그 선택하면 빨강 강조(단축키 Shift+백틱). 친 부분을 클릭하면 해제.">🖍 형광펜</button>
+        <button type="button" id="clearmark-btn" class="link" title="형광펜 전체 해제 (사람이 친 형광펜만)" hidden>↺</button>
         <button type="button" id="copy-btn" class="link">📋 복사</button>
         <button type="button" id="notion-btn" class="link">💾 Notion 저장</button>
       </div>
+      <div id="tabbar" class="tabbar" hidden></div>
       <div id="answer" class="answer"></div>
     </div>
     <script type="module" src="./main.ts"></script>
