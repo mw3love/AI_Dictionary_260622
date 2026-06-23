@@ -48,6 +48,7 @@ export function renderMarkdown(md: string): DocumentFragment {
       }
       i++; // 닫는 펜스 소비
       const pre = document.createElement('pre');
+      pre.dataset.lang = fence[1] || ''; // 직렬화 시 코드 언어 복원용
       const codeEl = document.createElement('code');
       codeEl.textContent = code.join('\n');
       pre.appendChild(codeEl);
@@ -61,6 +62,7 @@ export function renderMarkdown(md: string): DocumentFragment {
       flushPara();
       const level = Math.min(6, heading[1].length);
       const h = document.createElement(`h${Math.min(6, level + 2)}`); // h1→h3 … 팝업 안 과대 방지
+      h.dataset.level = String(level); // 복사·Notion 직렬화 시 원 헤딩 레벨 복원용
       appendInline(h, heading[2].trim());
       frag.appendChild(h);
       i++;

@@ -248,6 +248,10 @@ body {
   color: #e2552e;
   border-radius: 4px;
 }
+/* 사용자 형광펜은 색은 모델 코드와 같되, 클릭 해제 가능함을 커서로 표시. */
+.answer code.user-hl {
+  cursor: pointer;
+}
 .answer pre {
   padding: 8px 10px;
   background: var(--code-bg);
