@@ -58,11 +58,14 @@
       <section>
         <h2>Notion 저장 (선택)</h2>
         <p class="hint">
-          답변을 <code>💾 Notion 저장</code> 버튼으로 지정한 데이터베이스에 바로 저장합니다(제목=물어본 단어, 본문=답변 블록).
-          ① <code>notion.so/my-integrations</code> 에서 internal integration 생성 → 토큰 복사
-          ② 대상 DB 페이지 우상단 <code>⋯</code> → "연결(Connections)"에서 그 integration 추가
-          ③ DB ID 칸에는 그 <b>DB 페이지 주소(URL)를 통째로 붙여넣어도</b> 됩니다(자동으로 ID만 추출). 또는 URL 속 32자리 hex만 입력.
+          답변을 <code>💾 Notion 저장</code> 버튼으로 지정한 데이터베이스에 바로 저장합니다.
+          <span class="muted">(제목 = 물어본 단어, 본문 = 답변 블록)</span>
         </p>
+        <ol class="steps">
+          <li><code>notion.so/my-integrations</code> 에서 internal integration 생성 → 토큰 복사</li>
+          <li>대상 DB 페이지 우상단 <code>⋯</code> → "연결(Connections)"에서 그 integration 추가</li>
+          <li>아래 <b>DB ID / URL</b> 칸에 DB 페이지 주소(URL)를 통째로 붙여넣기 <span class="muted">(자동으로 ID만 추출 · URL 속 32자리 hex만 입력해도 됨)</span></li>
+        </ol>
         <label class="field">
           <span>integration 토큰</span>
           <input id="notion-token" type="password" placeholder="ntn_... 또는 secret_..." autocomplete="off" />

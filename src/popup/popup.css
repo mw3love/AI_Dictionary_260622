@@ -137,6 +137,7 @@ body {
   margin-top: 10px;
   overflow-x: auto;
   scrollbar-width: thin;
+  flex-shrink: 0; /* 답변이 길어 #app이 max-height를 넘겨도 탭바가 세로로 눌리지 않게 */
 }
 .tabbar[hidden] {
   display: none;

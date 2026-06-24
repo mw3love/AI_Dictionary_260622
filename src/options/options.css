@@ -140,6 +140,41 @@ textarea {
   color: var(--muted);
   margin: 0 0 10px;
 }
+.hint .muted,
+.steps .muted {
+  color: #80838d;
+}
+.steps {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 14px;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.steps li {
+  position: relative;
+  padding: 6px 0 6px 26px;
+  line-height: 1.55;
+  border-top: 1px solid var(--border);
+  counter-increment: step;
+}
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 17px;
+}
 code {
   padding: 1px 5px;
   background: #14151a;
