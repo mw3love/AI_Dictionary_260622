@@ -92,8 +92,9 @@ async function init(): Promise<void> {
   }
 
   input.focus();
-  // 복원된 입력은 커서를 끝에 둔다 — 이어서 수정·추가해 질문할 수 있게.
-  input.setSelectionRange(input.value.length, input.value.length);
+  // 복원된 입력은 전체 선택해 둔다 — 팝업을 열자마자 타이핑하면 기존 단어가 바로 교체되고,
+  // 그대로 이어쓰려면 →(오른쪽 화살표)나 클릭으로 선택을 풀면 된다. 빈 입력이면 select()는 무동작.
+  input.select();
 }
 
 form.addEventListener('submit', (e) => {
