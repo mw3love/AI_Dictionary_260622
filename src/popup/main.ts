@@ -33,6 +33,7 @@ const notionBtn = document.getElementById('notion-btn') as HTMLButtonElement;
 const resetBtn = document.getElementById('reset-btn') as HTMLButtonElement;
 
 const SESSION_KEY = 'popupState';
+const MAX_TABS = 10; // 매 검색이 새 탭이 되므로, 이 수를 넘으면 가장 오래된(오른쪽 끝) 탭부터 버려 폭증 방지.
 interface Tab {
   query: string; // 이 탭을 만든 질문(탭 라벨·Notion 제목)
   markdown: string; // 모델 원본 답변(그대로 보존)
@@ -49,7 +50,6 @@ let tabs: Tab[] = [];
 let active = -1; // 활성 탭 인덱스 (-1 = 답변 없음)
 let busy = false;
 let markMode = false; // 🖍 형광펜 ON이면 답변에서 드래그 선택 시 그 부분을 백틱(빨강)으로 토글.
-let pendingNewTab = false; // ✏ 입력창에로 채운 뒤 물어보기를 누르면 새 탭으로 열리게 하는 1회용 플래그.
 
 const curTab = (): Tab | undefined => (active >= 0 ? tabs[active] : undefined);
 
@@ -243,14 +243,13 @@ askSelBtn.addEventListener('click', () => {
   hideSelMenu();
   if (!text || busy) return;
   input.value = text;
-  void submit({ newTab: true });
+  void submit();
 });
 editSelBtn.addEventListener('click', () => {
   const text = selText;
   hideSelMenu();
   if (!text) return;
   input.value = text;
-  pendingNewTab = true; // 이걸로 채운 뒤 물어보기 = 새 탭
   input.focus();
   input.setSelectionRange(input.value.length, input.value.length);
 });
@@ -334,7 +333,6 @@ function switchTab(i: number): void {
   if (i < 0 || i >= tabs.length || i === active) return;
   active = i;
   input.value = tabs[i].query;
-  pendingNewTab = false;
   setMarkMode(false);
   hideSelMenu();
   hideNotice();
@@ -359,8 +357,8 @@ function closeTab(i: number): void {
 
 resetBtn.addEventListener('click', () => void reset());
 
-// opts.newTab=true면 새 탭을 만들어 거기에, 아니면 활성 탭을 그 자리에서 갱신(탭 없으면 첫 탭 생성).
-async function submit(opts?: { newTab?: boolean }): Promise<void> {
+// 매 검색은 새 탭으로 — 왼쪽 끝(index 0)에 추가·활성화해 최신이 맨 앞에 오게 한다.
+async function submit(): Promise<void> {
   const text = input.value.trim();
   if (!text || busy) return;
   busy = true;
@@ -370,17 +368,10 @@ async function submit(opts?: { newTab?: boolean }): Promise<void> {
   setMarkMode(false);
   toolbar.hidden = true;
 
-  let idx: number;
-  const createdTab = opts?.newTab || pendingNewTab || active < 0;
-  pendingNewTab = false;
-  if (createdTab) {
-    tabs.push({ query: text, markdown: '', marks: [] });
-    idx = tabs.length - 1;
-    active = idx;
-  } else {
-    idx = active;
-    tabs[idx].query = text;
-  }
+  tabs.unshift({ query: text, markdown: '', marks: [] });
+  if (tabs.length > MAX_TABS) tabs.length = MAX_TABS; // 오래된(오른쪽 끝) 탭부터 버려 폭증 방지
+  active = 0;
+  const idx = 0;
   renderTabbar();
   answerEl.classList.add('loading');
   answerEl.textContent = '생각 중…';
@@ -393,7 +384,7 @@ async function submit(opts?: { newTab?: boolean }): Promise<void> {
     saveNow();
   } catch (err) {
     // 새로 만든 빈 탭이면 실패 시 제거(찌꺼기 방지).
-    if (createdTab && tabs[idx] && !tabs[idx].markdown) {
+    if (tabs[idx] && !tabs[idx].markdown) {
       tabs.splice(idx, 1);
       active = tabs.length ? Math.min(idx, tabs.length - 1) : -1;
     }
@@ -411,7 +402,6 @@ async function reset(): Promise<void> {
   tabs = [];
   active = -1;
   input.value = '';
-  pendingNewTab = false;
   setMarkMode(false);
   hideSelMenu();
   renderActive();

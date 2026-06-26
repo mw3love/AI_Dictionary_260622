@@ -3,6 +3,7 @@
   --muted: #9aa0a8;
   --border: #3a3d44;
   --accent: #4f8cff;
+  --heading: #ffd28a; /* 답변 섹션 헤딩·표 헤더 골드 — 본문과 구분해 문단 경계를 또렷이 */
   --code-bg: #2a2d33;
   --code-fg: #5cc8d8;
   --bg: #1e1f24;
@@ -234,8 +235,13 @@ body {
 .answer h4,
 .answer h5,
 .answer h6 {
-  margin: 12px 0 6px;
+  margin: 14px 0 6px;
+  color: var(--heading);
   font-size: 14px;
+  font-weight: 700;
+}
+.answer h3 {
+  font-size: 15px; /* 최상위 섹션은 한 단계 크게 */
 }
 .answer p {
   margin: 6px 0;
@@ -248,17 +254,24 @@ body {
 .answer li {
   margin: 2px 0;
 }
-/* 백틱 = 강조(노션 인라인코드 룩). 모델이 쓴 코드와 사용자가 🖍로 친 형광펜이 같은 빨강으로 통일. */
+/* 백틱 = AI가 강조한 부분(인라인 코드 룩) → 파랑(--code-fg). 사용자가 🖍로 친 형광펜은 아래 .user-hl에서 빨강으로 분리. */
 .answer code {
   padding: 1px 5px;
   font-family: 'SFMono-Regular', Consolas, monospace;
   font-size: 0.92em;
-  background: rgba(226, 85, 46, 0.1);
-  color: #e2552e;
+  background: rgba(92, 200, 216, 0.12);
+  color: var(--code-fg);
   border-radius: 4px;
+  /* 밑줄 — 강조 span임을 한 번 더 표시. currentColor라 AI=파랑/사용자=빨강 밑줄이 자동 적용,
+     줄바꿈을 걸쳐도 각 줄마다 들어간다(border-bottom 대비 장점). */
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
-/* 사용자 형광펜은 색은 모델 코드와 같되, 클릭 해제 가능함을 커서로 표시. */
+/* 사용자 형광펜 — AI 강조(파랑)와 또렷이 구분되게 빨강. 클릭하면 해제됨을 커서로 표시. */
 .answer code.user-hl {
+  background: rgba(226, 85, 46, 0.12);
+  color: #e2552e;
   cursor: pointer;
 }
 .answer pre {
@@ -271,6 +284,7 @@ body {
   padding: 0;
   background: none;
   color: inherit;
+  text-decoration: none; /* 코드펜스 블록은 밑줄 제외(인라인 백틱만) */
 }
 .answer table {
   border-collapse: collapse;
@@ -286,6 +300,8 @@ body {
 }
 .answer th {
   background: var(--surface);
+  color: var(--heading);
+  font-weight: 700;
 }
 .answer hr {
   border: none;
