@@ -15,6 +15,13 @@
   box-sizing: border-box;
 }
 
+/* 오버레이 iframe 안에서 문서 레벨 스크롤바를 없앤다 — 높이가 내용에 맞춰지므로 불필요하고,
+   세로 스크롤바가 폭을 먹어 가로 스크롤바까지 생기던 문제도 제거. 긴 답변은 .answer가 자체 스크롤. */
+html,
+body {
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   width: 420px;

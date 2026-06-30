@@ -113,6 +113,31 @@ input.addEventListener('keydown', (e) => {
 // 입력 변화도 세션에 보존 — 답변 전에 닫아도 적은 내용이 남게.
 input.addEventListener('input', debounce(saveNow, 300));
 
+// Esc — 오버레이(iframe)로 떠 있을 때 부모에 닫기 요청. 폴백 단독 창에선 부모=자기 자신이라 무해하게 무시됨.
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && window.parent !== window) window.parent.postMessage('ai-dict-close', '*');
+});
+
+// 오버레이(iframe)일 때만 — 내용 높이를 부모에 알려 패널이 내용만큼만 차지하게(검색 전 짧게 → 답 길면 늘어남).
+// (단독 창 폴백에선 창 자체 크기를 쓰므로 불필요.) body는 margin 0 + #app(max-height 588) 단일 자식이라
+// body.scrollHeight가 곧 콘텐츠 높이. 긴 답변은 #app 안 .answer가 자체 스크롤하므로 이 값이 과하게 안 커진다.
+if (window.parent !== window) {
+  // 높이 변화를 프레임당 1회로 합쳐 부모에 전달 — ResizeObserver가 렌더 중 여러 번 발화해도
+  // 호스트(유튜브) 페이지 리플로우가 중복되지 않게(버벅임 완화).
+  let pending = false;
+  const reportHeight = (): void => {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => {
+      pending = false;
+      window.parent.postMessage({ type: 'ai-dict-height', height: document.body.scrollHeight }, '*');
+    });
+  };
+  new ResizeObserver(reportHeight).observe(document.body);
+  window.addEventListener('load', reportHeight);
+  reportHeight();
+}
+
 copyBtn.addEventListener('click', () => {
   const t = curTab();
   if (!t || !t.markdown) return;
