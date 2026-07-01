@@ -38,6 +38,7 @@ interface Tab {
   query: string; // 이 탭을 만든 질문(탭 라벨·Notion 제목)
   markdown: string; // 모델 원본 답변(그대로 보존)
   marks: MarkRange[]; // 사용자가 친 형광펜(렌더 텍스트 기준 offset 범위) — 재렌더 시 DOM에 다시 입힘
+  notion?: { title: string; url: string }; // Notion 저장 결과(제목·페이지 URL). 있으면 탭에 ✓ 표시 + 저장됨 알림 유지. url은 없을 수 있음('').
 }
 interface PopupState {
   tabs: Tab[];
@@ -83,10 +84,11 @@ async function init(): Promise<void> {
   // 닫기 전 상태가 있으면 복원.
   const saved = await loadState();
   if (saved && saved.tabs && saved.tabs.length) {
-    tabs = saved.tabs.map((t) => ({ query: t.query, markdown: t.markdown, marks: sanitizeMarks(t.marks) }));
+    tabs = saved.tabs.map((t) => ({ query: t.query, markdown: t.markdown, marks: sanitizeMarks(t.marks), notion: t.notion }));
     active = Math.min(Math.max(0, saved.active ?? 0), tabs.length - 1);
     input.value = saved.input ?? curTab()?.query ?? '';
     renderActive();
+    syncNotice(); // 복원된 활성 탭이 이미 저장돼 있으면 "저장됨" 알림도 되살림
   } else if (saved && saved.input) {
     input.value = saved.input;
   }
@@ -175,8 +177,10 @@ async function saveToNotionFlow(): Promise<void> {
   try {
     const { url, title } = await saveToNotion(word, domToMarkdown(answerEl));
     notionBtn.textContent = '✓ 저장됨';
-    if (url) showNoticeLink(`Notion에 저장됨: 「${title}」 — `, url, '페이지 열기 ↗');
-    else showNotice(`Notion에 저장됨: 「${title}」`, false);
+    t.notion = { title, url: url ?? '' }; // 탭에 저장 사실 기록 → ✓ 배지 + 탭 전환해도 알림 유지
+    renderTabbar(); // 활성 탭 라벨에 ✓ 즉시 반영
+    saveNow();
+    showSavedNotice(t);
     setTimeout(() => {
       notionBtn.textContent = '💾 Notion 저장';
       notionBtn.disabled = false;
@@ -349,6 +353,14 @@ function renderTabbar(): void {
   tabs.forEach((t, i) => {
     const el = document.createElement('div');
     el.className = 'tab' + (i === active ? ' active' : '');
+    // Notion에 저장된 탭엔 ✓ 배지 — 탭을 다시 눌러 보지 않아도 저장 여부가 한눈에 보이게.
+    if (t.notion) {
+      const check = document.createElement('span');
+      check.className = 'tab-check';
+      check.textContent = '✓';
+      check.title = 'Notion에 저장됨';
+      el.appendChild(check);
+    }
     const label = document.createElement('button');
     label.type = 'button';
     label.className = 'tab-label';
@@ -375,8 +387,8 @@ function switchTab(i: number): void {
   input.value = tabs[i].query;
   setMarkMode(false);
   hideSelMenu();
-  hideNotice();
   renderActive();
+  syncNotice(); // 저장된 탭이면 "저장됨" 알림 유지, 아니면 숨김
   saveNow();
 }
 
@@ -392,6 +404,7 @@ function closeTab(i: number): void {
     input.value = tabs[active].query;
   }
   renderActive();
+  syncNotice(); // 닫은 뒤 새 활성 탭 기준으로 알림 동기화
   saveNow();
 }
 
@@ -499,6 +512,18 @@ function showNoticeLink(text: string, url: string, linkText: string): void {
 }
 function hideNotice(): void {
   noticeEl.hidden = true;
+}
+// 저장된 탭의 "Notion에 저장됨" 알림(페이지 열기 링크 포함)을 띄운다. url이 없으면 링크 없이 텍스트만.
+function showSavedNotice(t: Tab): void {
+  if (!t.notion) return;
+  if (t.notion.url) showNoticeLink(`Notion에 저장됨: 「${t.notion.title}」 — `, t.notion.url, '페이지 열기 ↗');
+  else showNotice(`Notion에 저장됨: 「${t.notion.title}」`, false);
+}
+// 현재 활성 탭 기준으로 알림 동기화 — 저장된 탭이면 저장됨 알림 유지, 아니면 숨김.
+function syncNotice(): void {
+  const t = curTab();
+  if (t?.notion) showSavedNotice(t);
+  else hideNotice();
 }
 
 function debounce(fn: () => void, ms: number): () => void {

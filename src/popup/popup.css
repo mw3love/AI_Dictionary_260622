@@ -175,6 +175,18 @@ body {
   background: var(--surface-2);
   border-color: var(--accent);
 }
+/* Notion 저장됨 배지 — 저장된 탭 라벨 앞의 초록 ✓ */
+.tab-check {
+  flex: 0 0 auto;
+  padding-left: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #8fd9a8;
+}
+/* ✓가 있으면 라벨 왼쪽 여백을 줄여 배지와 붙게(이중 여백 방지). */
+.tab-check + .tab-label {
+  padding-left: 4px;
+}
 .tab-label {
   font: inherit;
   font-size: 12px;
