@@ -138,6 +138,21 @@ if (window.parent !== window) {
   reportHeight();
 }
 
+// 오버레이(iframe)로 열릴 때 커서를 입력창에 잡아 준다.
+// 부모(background)가 iframe에 포커스를 넘기는 시점(frame.focus())이 init()의 input.focus()보다
+// 늦으면, 포커스 없는 iframe에서 준 input.focus()는 활성요소로 등록되지 않아 커서가 입력창에
+// 안 잡힌다(브라우저 quirk — 마우스로 한 번 클릭해야 입력됨). 부모가 iframe에 포커스를 준 순간
+// (=iframe window의 focus 이벤트)에 입력창으로 커서를 다시 옮겨 순서와 무관하게 보장한다.
+// 열린 직후 잠깐만 감시하고 해제 → 이후 답변을 보다 창을 떠났다 돌아올 때 커서가 튀지 않게.
+if (window.parent !== window) {
+  const focusInput = (): void => {
+    input.focus();
+    input.select(); // 복원된 입력은 전체 선택(init과 동일 동작) — 빈 입력이면 무동작.
+  };
+  window.addEventListener('focus', focusInput);
+  setTimeout(() => window.removeEventListener('focus', focusInput), 1000);
+}
+
 copyBtn.addEventListener('click', () => {
   const t = curTab();
   if (!t || !t.markdown) return;

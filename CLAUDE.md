@@ -14,3 +14,4 @@
 
 - UI는 브라우저 액션 팝업이 아니라 **페이지에 주입하는 iframe 오버레이**다(`src/background/index.ts`가 `Alt+Q`/아이콘 클릭 시 현재 탭에 주입). 이유: 액션 팝업은 위치를 Chrome이 툴바 아이콘에 앵커해 결정 → YouTube 전체화면처럼 툴바가 숨으면 팝업이 왼쪽/화면 밖으로 튀어 일관성이 없었다.
 - 오버레이가 띄우는 `src/popup/index.html`은 **manifest 엔트리가 아니므로** `vite.config.ts`의 `rollupOptions.input.popup`으로 직접 등록해야 변환된다. 빠지면 crxjs가 원본을 그대로 복사해 `./popup.css`·`./main.ts`(TS 원본)를 가리켜 **iframe이 스타일·JS 없이 뜬다.**
+- **입력창 자동 포커스는 2단계**다: 부모(`background`)가 `frame.focus()`로 iframe에 포커스를 넘긴 *뒤에야* iframe 안 `input.focus()`가 실제 활성요소로 등록된다(포커스 없는 iframe에서 준 focus는 무시되는 브라우저 quirk → 커서가 안 잡혀 마우스 클릭이 필요해짐). 순서가 경쟁하므로 `main.ts`는 iframe window의 `focus` 이벤트(=부모가 포커스 준 순간)에 입력창을 다시 focus한다. 포커스 관련 코드 수정 시 이 2단계·순서 무관 보장을 깨지 않게 주의.
