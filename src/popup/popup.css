@@ -287,10 +287,13 @@ body {
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
 }
-/* 사용자 형광펜 — AI 강조(파랑)와 또렷이 구분되게 빨강. 클릭하면 해제됨을 커서로 표시. */
+/* 사용자 형광펜 — AI 강조(파랑)와 또렷이 구분되게 빨강. */
 .answer code.user-hl {
   background: rgba(226, 85, 46, 0.12);
   color: #e2552e;
+}
+/* 손모양 커서는 형광펜 모드일 때만 — 그때만 클릭으로 해제되므로(모드 아니면 클릭 무시). */
+.answer.mark-mode code.user-hl {
   cursor: pointer;
 }
 .answer pre {

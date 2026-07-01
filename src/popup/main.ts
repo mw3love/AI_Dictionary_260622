@@ -224,8 +224,10 @@ answerEl.addEventListener('mouseup', () => {
   else setTimeout(showSelMenu, 0);
 });
 
-// 형광펜 친 부분(빨강 code)을 클릭하면 그 마크만 취소. 모델 코드는 class가 없어 무시(불변).
+// 형광펜 모드에서 형광펜 친 부분(빨강 code)을 클릭하면 그 마크만 취소. 모델 코드는 class가 없어 무시(불변).
+// 형광펜 모드가 아닐 땐 무시 — 그냥 드래그로 텍스트 선택만 하려는데 클릭이 형광펜을 지우는 걸 막는다.
 answerEl.addEventListener('click', (e) => {
+  if (!markMode) return;
   const code = (e.target as HTMLElement).closest('code.user-hl');
   if (!code) return;
   const t = curTab();
