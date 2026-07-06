@@ -42,8 +42,11 @@ export default defineManifest({
     // 커스텀 커맨드를 따로 두면 Chrome이 항상 보여주는 "확장 활성화" 단축키와 중복돼 항목이 2개가 되므로,
     // 액션 활성화 단축키 하나로 통합한다. 왼손 전용(오른손은 마우스).
     // 기존 install은 이 기본값이 자동 반영 안 될 수 있어 chrome://extensions/shortcuts 에서 확인/지정 필요.
+    // Alt+Q는 youtube_dual_subtitle 확장이 "자막 직접 질문" 단축키로 가져감(YouTube에서 동시 발화 방지).
+    // 기본 단축키를 비운다 — 아이콘 클릭으로 토글되고, 원하면 chrome://extensions/shortcuts 에서
+    // 사용자가 직접 키를 지정. (Alt+D 등은 Chrome 내장 단축키와 충돌해 무시되므로 기본값을 안 박음.
+    //  기존 install은 어차피 옛 suggested_key가 Chrome에 캐시돼 수동 변경이 필요.)
     _execute_action: {
-      suggested_key: { default: 'Alt+Q', mac: 'Alt+Q' },
       description: 'AI 사전 오버레이 열기/닫기',
     },
   },
