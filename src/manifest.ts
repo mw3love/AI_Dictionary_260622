@@ -6,11 +6,25 @@ export default defineManifest({
   name: 'AI Dictionary',
   description: pkg.description,
   version: pkg.version,
+  // 스파클 A 아이콘(다크 라운드 사각 + 흰 세리프 A + AI 스파클). crxjs가 매니페스트 경로를
+  // <root>/icons/ 에서 찾아 그대로 dist/icons/ 로 출력한다(해싱 없음, public 자동복사와 겹치지 않게 루트에 둠).
+  icons: {
+    16: 'icons/icon16.png',
+    32: 'icons/icon32.png',
+    48: 'icons/icon48.png',
+    128: 'icons/icon128.png',
+  },
   action: {
     // default_popup 없음 → 아이콘 클릭이 action.onClicked로 떨어져 배경 SW가 현재 탭에 오버레이를 토글 주입.
     // (예전엔 브라우저 액션 팝업이었으나 위치를 Chrome이 툴바 아이콘에 앵커해 결정 →
     //  YouTube 전체화면처럼 툴바가 숨으면 팝업이 왼쪽/화면 밖으로 튀어 일관성이 없었다. background/index.ts 참고.)
     default_title: 'AI 사전 (Alt+Q 또는 클릭)',
+    default_icon: {
+      16: 'icons/icon16.png',
+      32: 'icons/icon32.png',
+      48: 'icons/icon48.png',
+      128: 'icons/icon128.png',
+    },
   },
   options_page: 'src/options/index.html',
   // 오버레이는 페이지에 주입한 iframe(확장 origin)이 기존 팝업(src/popup)을 그대로 띄운다 →
