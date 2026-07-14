@@ -16,7 +16,7 @@ import type { MarkRange } from './mark';
 import { renderMarkdown } from '../shared/markdown';
 import { loadSettings } from '../shared/settings';
 import type { Settings } from '../shared/settings';
-import { getGeminiApiKey, getMindlogicApiKey } from '../shared/secrets';
+import { getMindlogicApiKey } from '../shared/secrets';
 
 const input = document.getElementById('input') as HTMLTextAreaElement;
 const form = document.getElementById('ask-form') as HTMLFormElement;
@@ -66,19 +66,12 @@ void init();
 
 async function init(): Promise<void> {
   settings = await loadSettings();
-  metaEl.textContent =
-    settings.backend === 'gemini'
-      ? `Gemini · ${settings.geminiModel}`
-      : `Mindlogic · ${settings.mindlogicModel}`;
+  metaEl.textContent = `Mindlogic · ${settings.mindlogicModel}`;
 
   // 키 확인 — 없으면 설정 안내.
-  const key =
-    settings.backend === 'gemini' ? await getGeminiApiKey() : await getMindlogicApiKey();
+  const key = await getMindlogicApiKey();
   if (!key) {
-    showNotice(
-      `${settings.backend === 'gemini' ? 'Gemini' : 'Mindlogic'} API 키가 없습니다. ⚙ 설정에서 입력하세요.`,
-      false,
-    );
+    showNotice('Mindlogic API 키가 없습니다. ⚙ 설정에서 입력하세요.', false);
   }
 
   // 닫기 전 상태가 있으면 복원.

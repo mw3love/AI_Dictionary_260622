@@ -32,10 +32,12 @@ export default defineManifest({
   // 단축키/아이콘은 사용자 제스처라 activeTab으로 그 탭에만 그 순간 주입 → 광범위 host 권한 불필요.
   permissions: ['storage', 'scripting', 'activeTab'],
   host_permissions: [
-    // Gemini (BYOK) — 사용자가 옵션에서 본인 키 입력 시에만 호출.
-    'https://generativelanguage.googleapis.com/*',
     // Mindlogic API Gateway (BYOK) — 학교/조직 계정 키로 OpenAI/Anthropic/Gemini 등 통과.
-    'https://factchat-cloud.mindlogic.ai/*',
+    // 가입 단체(조직)마다 base URL 호스트가 다르므로 알려진 두 도메인을 와일드카드로 커버.
+    // (factchat-cloud.mindlogic.ai / factchat.mindlogic-kr-api.com 등. 완전히 새로운 도메인의
+    //  단체가 생기면 여기에 그 도메인을 추가해야 확장이 직접 fetch 가능하다.)
+    'https://*.mindlogic.ai/*',
+    'https://*.mindlogic-kr-api.com/*',
     // Notion API (BYOK) — 답변을 사용자의 Notion DB에 저장. host_permission이 있어야 확장에서 직접 fetch(CORS 면제).
     'https://api.notion.com/*',
   ],

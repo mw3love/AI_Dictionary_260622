@@ -181,8 +181,3 @@ code {
   border-radius: 4px;
   font-family: 'SFMono-Regular', Consolas, monospace;
 }
-
-/* 현재 선택된 백엔드가 아닌 섹션은 흐리게(완전 숨기지 않음 — 둘 다 키 입력 가능하게). */
-section.dimmed {
-  opacity: 0.55;
-}

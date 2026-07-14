@@ -1,6 +1,6 @@
 # AI Dictionary
 
-궁금한 영어 표현을 **빠르게** 묻는 AI 사전 Chrome 확장. 전역 단축키로 현재 페이지 위에 오버레이 패널을 열어 단어·표현·질문을 입력하면 AI가 뜻·유래·예문을 markdown으로 답한다. BYOK(본인 키) — Gemini 또는 Mindlogic Gateway.
+궁금한 영어 표현을 **빠르게** 묻는 AI 사전 Chrome 확장. 전역 단축키로 현재 페이지 위에 오버레이 패널을 열어 단어·표현·질문을 입력하면 AI가 뜻·유래·예문을 markdown으로 답한다. BYOK(본인 키) — Mindlogic Gateway (가입 단체별로 base URL을 옵션에서 지정).
 
 ## 사용 흐름
 1. (선택) PasteFlow 등 외부 OCR로 화면의 영단어를 추출해 클립보드에 복사.
@@ -26,7 +26,7 @@
 3. `chrome://extensions/shortcuts` 에서 단축키 확인/변경
 
 ## 설정
-옵션 페이지(다크 테마)에서 백엔드 선택, API 키 입력(+테스트), 모델 선택, **모델 새로고침**(게이트웨이/Gemini의 실제 가용 모델을 `/models`로 가져와 드롭다운에 표시 + `storage.local` 캐시), 사전 프롬프트 편집, **Notion 저장**(선택) 설정.
+옵션 페이지(다크 테마)에서 Mindlogic Gateway의 **base URL**(가입 단체마다 다름 — 코드가 `/chat/completions`·`/models`를 자동으로 붙임)·API 키 입력(+테스트), 모델 선택, **모델 새로고침**(게이트웨이의 실제 가용 모델을 `/models`로 가져와 드롭다운에 표시 + `storage.local` 캐시), 사전 프롬프트 편집, **Notion 저장**(선택) 설정.
 키는 `chrome.storage.local`(동기화 제외), 설정은 `chrome.storage.sync`, 팝업의 입력·답변 상태는 `chrome.storage.session`(브라우저 세션 동안만 유지).
 
 ### Notion 저장 (선택)
@@ -41,7 +41,7 @@
 - `src/background/index.ts` — 배경 서비스 워커. 단축키(기본 미설정, 사용자 지정)/아이콘 클릭 시 `activeTab`+`scripting`으로 **현재 탭에 오버레이(iframe) 토글 주입**. iframe은 `src/popup/`(확장 origin)을 그대로 띄우고, 위치 고정·드래그 이동·최소화·전체화면 재부착(`fullscreenElement`)을 부모(페이지) 측에서 제어. 주입 불가 페이지(chrome:// 등)는 작은 팝업 창으로 폴백.
 - `src/popup/` — 입력창 + 답변 렌더 + 답변 탭 (메인 UI). 오버레이 iframe 안에서 동작. `mark.ts` = 🖍 형광펜(렌더된 답변 DOM에서 선택 부분을 `<code class="user-hl">`로 직접 감싸는 오버레이 방식 — 마크는 탭별 *렌더 텍스트 offset 범위*로 보관해 재렌더 시 다시 입히고, 모델이 쓴 코드와 클래스로 구분, 복사·Notion은 DOM→markdown 직렬화)
 - `src/options/` — 키·모델·프롬프트 설정
-- `src/backends/ask.ts` — Gemini/Mindlogic 단발 chat 호출 (오버레이 iframe=확장 origin에서 직접 fetch; 배경 SW는 오버레이 주입 전용이라 호출 경로엔 관여 안 함)
+- `src/backends/ask.ts` — Mindlogic Gateway 단발 chat 호출 (조직별 base URL + `/chat/completions`; 오버레이 iframe=확장 origin에서 직접 fetch; 배경 SW는 오버레이 주입 전용이라 호출 경로엔 관여 안 함)
 - `src/backends/notion.ts` — 답변을 Notion DB에 페이지로 저장 + markdown→Notion 블록 변환
 - `src/shared/` — settings·secrets·markdown 렌더러·프롬프트·모델 목록
 

@@ -10,36 +10,16 @@
     <main>
       <h1>AI 사전 설정</h1>
 
-      <section>
-        <h2>백엔드</h2>
-        <label class="field">
-          <span>사용할 백엔드</span>
-          <select id="backend">
-            <option value="gemini">Gemini (Google 본인 키)</option>
-            <option value="mindlogic">Mindlogic Gateway (학교/조직 키)</option>
-          </select>
-        </label>
-      </section>
-
-      <section id="sec-gemini">
-        <h2>Gemini</h2>
-        <label class="field">
-          <span>API 키</span>
-          <input id="gemini-key" type="password" placeholder="AIza..." autocomplete="off" />
-        </label>
-        <label class="field">
-          <span>모델</span>
-          <select id="gemini-model"></select>
-        </label>
-        <div class="actions">
-          <button type="button" id="gemini-test">키 테스트</button>
-          <button type="button" id="gemini-refresh">모델 새로고침</button>
-          <span id="gemini-test-result" class="result"></span>
-        </div>
-      </section>
-
       <section id="sec-mindlogic">
-        <h2>Mindlogic</h2>
+        <h2>Mindlogic Gateway</h2>
+        <p class="hint">
+          가입한 단체(조직)에 따라 게이트웨이 <b>base URL</b>이 다릅니다. 발급처에서 안내한 base 주소를 넣으세요
+          <span class="muted">(코드가 <code>/chat/completions</code>·<code>/models</code>를 자동으로 붙임 · 끝 슬래시 무시)</span>.
+        </p>
+        <label class="field">
+          <span>base URL</span>
+          <input id="mindlogic-baseurl" type="text" placeholder="https://factchat-cloud.mindlogic.ai/v1/gateway" autocomplete="off" />
+        </label>
         <label class="field">
           <span>API 키</span>
           <input id="mindlogic-key" type="password" placeholder="Bearer 토큰" autocomplete="off" />

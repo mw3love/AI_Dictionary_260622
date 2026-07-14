@@ -4,75 +4,31 @@
 //
 // 팝업/옵션은 확장 origin 페이지라 host_permissions가 있으면 직접 fetch 가능 → SW 불필요.
 
-import { getGeminiApiKey, getMindlogicApiKey } from '../shared/secrets';
-import { loadSettings } from '../shared/settings';
+import { getMindlogicApiKey } from '../shared/secrets';
+import { loadSettings, DEFAULT_MINDLOGIC_BASE_URL } from '../shared/settings';
 
 const TAG = '[AID/ask]';
-const GEMINI_ENDPOINT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-const MINDLOGIC_ENDPOINT = 'https://factchat-cloud.mindlogic.ai/v1/gateway/chat/completions';
 
 // 표·예문 여러 개로 길어질 수 있어 토큰 여유를 크게(잘림 방지).
 const MAX_TOKENS = 4096;
 
-// 옛 Gemini 모델 별칭 → 실제 ID. 호환용(현재 기본값은 이미 실제 ID).
-const GEMINI_ALIAS: Record<string, string> = {
-  flash: 'gemini-2.5-flash',
-  'flash-lite': 'gemini-2.5-flash-lite',
-  '3.5-flash': 'gemini-3.5-flash',
-};
-function resolveGeminiModelId(model: string): string {
-  return GEMINI_ALIAS[model] ?? model;
+// base URL(조직별) + 경로로 실제 엔드포인트 조립. 끝 슬래시는 제거해 `//` 중복 방지.
+function endpoint(baseUrl: string, path: string): string {
+  const base = (baseUrl || DEFAULT_MINDLOGIC_BASE_URL).trim().replace(/\/+$/, '');
+  return base + path;
 }
 
-// 팝업에서 호출하는 메인 진입점 — 현재 설정의 backend/model/prompt로 호출.
+// 팝업에서 호출하는 메인 진입점 — 현재 설정의 model/base URL/prompt로 호출.
 export async function ask(userText: string): Promise<string> {
   const s = await loadSettings();
-  if (s.backend === 'mindlogic') {
-    return askMindlogic(s.dictPrompt, userText, s.mindlogicModel);
-  }
-  return askGemini(s.dictPrompt, userText, s.geminiModel);
-}
-
-export async function askGemini(
-  prompt: string,
-  userMsg: string,
-  model: string,
-  apiKeyOverride?: string,
-): Promise<string> {
-  const apiKey = apiKeyOverride ?? (await getGeminiApiKey());
-  if (!apiKey) throw new Error('Gemini API 키가 없음 (옵션 페이지에서 입력 필요)');
-  const url = `${GEMINI_ENDPOINT_BASE}/${resolveGeminiModelId(model)}:generateContent`;
-  const body = {
-    systemInstruction: { parts: [{ text: prompt }] },
-    contents: [{ role: 'user', parts: [{ text: userMsg }] }],
-    generationConfig: { temperature: 0.3, maxOutputTokens: MAX_TOKENS },
-  };
-
-  const res = await fetchWithRetry(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) throw httpError('Gemini', res.status, await res.text().catch(() => ''));
-  const data = (await res.json()) as {
-    candidates?: Array<{
-      content?: { parts?: Array<{ text?: string }> };
-      finishReason?: string;
-    }>;
-  };
-  const candidate = data.candidates?.[0];
-  const text = candidate?.content?.parts?.map((p) => p.text ?? '').join('') ?? '';
-  if (!text.trim()) {
-    throw new Error(`Gemini 응답 없음 (finishReason=${candidate?.finishReason ?? 'unknown'})`);
-  }
-  return text;
+  return askMindlogic(s.dictPrompt, userText, s.mindlogicModel, s.mindlogicBaseUrl);
 }
 
 export async function askMindlogic(
   prompt: string,
   userMsg: string,
   model: string,
+  baseUrl: string,
   apiKeyOverride?: string,
 ): Promise<string> {
   const apiKey = apiKeyOverride ?? (await getMindlogicApiKey());
@@ -87,7 +43,7 @@ export async function askMindlogic(
     max_tokens: MAX_TOKENS,
   };
 
-  const res = await fetchWithRetry(MINDLOGIC_ENDPOINT, {
+  const res = await fetchWithRetry(endpoint(baseUrl, '/chat/completions'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify(body),
@@ -105,12 +61,9 @@ export async function askMindlogic(
   return text;
 }
 
-// 옵션 "테스트" 버튼용 — 저장 우회로 explicit 키/모델을 직접 검증.
-export async function testGemini(apiKey: string, model: string): Promise<string> {
-  return askGemini('You are a helpful assistant. Answer briefly.', 'Say "OK" in one word.', model, apiKey);
-}
-export async function testMindlogic(apiKey: string, model: string): Promise<string> {
-  return askMindlogic('You are a helpful assistant. Answer briefly.', 'Say "OK" in one word.', model, apiKey);
+// 옵션 "테스트" 버튼용 — 저장 우회로 explicit base URL/키/모델을 직접 검증.
+export async function testMindlogic(baseUrl: string, apiKey: string, model: string): Promise<string> {
+  return askMindlogic('You are a helpful assistant. Answer briefly.', 'Say "OK" in one word.', model, baseUrl, apiKey);
 }
 
 // 429/5xx만 1회 1500ms 백오프 재시도. 나머지는 그대로 반환해 호출 측이 status로 분기.
